@@ -1,0 +1,9 @@
+name: ArchonCrates
+main: me.ArchonCrates.hammy2899.Main
+version: 8.0
+softdepend: [Vault]
+commands:
+   ArchonCrates:
+      description: Main command for ArchonCrates
+      usage: /<command>
+      aliases: ac
