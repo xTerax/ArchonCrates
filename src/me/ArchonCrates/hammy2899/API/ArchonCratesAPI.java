@@ -63,7 +63,7 @@ public class ArchonCratesAPI {
 	// Give key method
 	@SuppressWarnings("deprecation")
 	public void giveKey(String playerName, int keyAmount, String keyName) {
-		
+
 		Player target = Bukkit.getPlayer(playerName);
 		
 		int amount = keyAmount;
@@ -80,6 +80,14 @@ public class ArchonCratesAPI {
 		target.getInventory().addItem(key);
 		target.updateInventory();
 		
+	}
+	
+	// Check key type
+	public boolean checkKeyType(String keyName) {
+		if(main.keys.contains("Keys." + keyName)) {
+			return true;
+		}
+		return false;
 	}
 	
 	// Language method
@@ -147,6 +155,9 @@ public class ArchonCratesAPI {
 		if(messageType.equals(LangMessages.NOECOPLUGIN)) {
 			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Signs.No economy plugin"));
 		}
+		if(messageType.equals(LangMessages.NOKEY)) {
+			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.giveKey.No key"));
+		}
 		
 		return message;
 	}
@@ -196,9 +207,7 @@ public class ArchonCratesAPI {
 		for(String s : main.keys.getStringList("Keys." + keyName + ".loot")) keyLoot.add(s);
 		
 		// Main crate GUI
-		Random random = new Random();
-		int titleColour = random.nextInt(9) + 0;
-		final Inventory crateGUI = Bukkit.createInventory(player, 27, ChatColor.translateAlternateColorCodes('&', "&" + titleColour + "Crate"));
+		final Inventory crateGUI = Bukkit.createInventory(player, 27, ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("Crate Title")));
 		
 		// Sets the glass colours
 		Random glassColour = new Random();
@@ -271,7 +280,6 @@ public class ArchonCratesAPI {
 				
 			}
 		}, 0L, itemTime);
-		
 		
 		// Changes glass colours
 		if(main.getConfig().getString("Solid Background Colour").equalsIgnoreCase("true")) {
@@ -467,13 +475,7 @@ public class ArchonCratesAPI {
 					Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), commandsList.get(0).replaceAll("<player>", player.getName()));
 					commandsList.remove(0);
 					size--;
-				}					
-				
-				// Sets the "Crate Use" to false so it can be used again
-				main.getConfig().set("Crate Use", false);
-				main.saveConfig();
-				main.reloadConfig();
-				
+				}				
 				
 				// Broadcast
 				

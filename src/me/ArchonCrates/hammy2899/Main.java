@@ -120,6 +120,7 @@ public class Main extends JavaPlugin {
 			files++;
 			
 			getConfig().set("Crate Type", 54);
+			getConfig().set("Crate Title", "&aCrate");
 			getConfig().set("Open Sound", "CHEST_OPEN");
 			getConfig().set("Win Sound", "LEVEL_UP");
 			getConfig().set("Crate Effect Enabled", true);
@@ -211,7 +212,7 @@ public class Main extends JavaPlugin {
 			loot.set("Crate Loot.Sword.Prize Name", "diamond sword");
 			ArrayList<String> swordCommands = new ArrayList<>();
 			swordCommands.add("give <player> 276 1");
-			getConfig().set("Crate Loot.Sword.Command", swordCommands);
+			loot.set("Crate Loot.Sword.Command", swordCommands);
 			
 			//Gold loot
 			loot.set("Crate Loot.Gold.Item ID", 266);
@@ -301,6 +302,7 @@ public class Main extends JavaPlugin {
 			lang.set("Commands.remove.blockNotCrate", "&cThat block is not a crate!");
 			lang.set("Commands.giveKey.given", "&aGiven <amount> keys to <player>");
 			lang.set("Commands.giveKey.notOnline", "&c<player> is not online! You cant give keys to offline players!");
+			lang.set("Commands.giveKey.No key", "&cThere is no key with that name!");
 			// Signs lang
 			lang.set("Signs.No economy plugin", "&cYou can't buy keys because Vault is not installed! Contact an Administrator");
 			lang.set("Signs.buy.created", "&aBuy sign created!");
@@ -615,6 +617,10 @@ public class Main extends JavaPlugin {
 						
 						if(!(target == null)) {
 							
+							if(acAPI.checkKeyType(args[3]) == false) {
+								sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.NOKEY));
+								return true;
+							}
 							acAPI.giveKey(args[1], Integer.parseInt(args[2]), args[3]);
 							
 							sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.GIVEN).replaceAll("<player>", args[1]).replaceAll("<amount>", args[2]));
