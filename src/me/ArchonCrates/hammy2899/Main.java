@@ -159,6 +159,7 @@ public class Main extends JavaPlugin {
 			keys.set("Keys.default.name", "&aCrate Key");
 			keys.set("Keys.default.lore", defaultLore);
 			keys.set("Keys.default.itemId", 131);
+			keys.set("Keys.default.glow", true);
 			
 			ArrayList<String> defaultLoot = new ArrayList<>();
 			defaultLoot.add("diamonds");
@@ -288,7 +289,7 @@ public class Main extends JavaPlugin {
 			// Main lang
 			lang.set("Prefix", "&7[&aArchonCrates&7] ");
 			lang.set("Error Message", "&cError, try /archoncrates");
-			lang.set("No Permission", "&cYou do not have permission to do that command!");
+			lang.set("No Permission", "&cYou do not have permission to do that!");
 			lang.set("Player Only Command", "&cThis command is for players only!");
 			lang.set("Crate In use", "&cThat crate is in use try again later!");
 			// Commands lang
@@ -300,9 +301,10 @@ public class Main extends JavaPlugin {
 			lang.set("Commands.remove.notCrate", "&cThat is not a crate!");
 			lang.set("Commands.remove.noCrates", "&cThere are no crates to remove!");
 			lang.set("Commands.remove.blockNotCrate", "&cThat block is not a crate!");
-			lang.set("Commands.giveKey.given", "&aGiven <amount> keys to <player>");
+			lang.set("Commands.giveKey.given", "&aGiven <amount> keys to <player>!");
 			lang.set("Commands.giveKey.notOnline", "&c<player> is not online! You cant give keys to offline players!");
 			lang.set("Commands.giveKey.No key", "&cThere is no key with that name!");
+			lang.set("Commands.giveKey.given all", "&aGiven <amount> keys to all players!");
 			// Signs lang
 			lang.set("Signs.No economy plugin", "&cYou can't buy keys because Vault is not installed! Contact an Administrator");
 			lang.set("Signs.buy.created", "&aBuy sign created!");
@@ -313,9 +315,12 @@ public class Main extends JavaPlugin {
 			
 			saveLang();
 		}
-
+		
 		// Sets-up API
 		ArchonCratesAPI acAPI = new ArchonCratesAPI(this);
+		
+		// Register Glow Enchant
+		acAPI.registerGlow();
 		
 		// Sets up the economey
 		acAPI.setupEconomy();
@@ -361,6 +366,7 @@ public class Main extends JavaPlugin {
 					sender.sendMessage(ChatColor.GRAY + "--=[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "]=--");
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Shows the help page");
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates key [player] [amount] [keyType]" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Gives the player the amount of keys you enter");
+					sender.sendMessage(ChatColor.GREEN + "/archoncrates giveall [keyType] [amount]" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Gives all players the amount of keys you enter");
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates keys" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Shows a list of all the keys");
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates crate [keyType]" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Opens a crate");
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates create" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Makes the block you are looking at a crate (If it is the crate type)");
@@ -545,7 +551,7 @@ public class Main extends JavaPlugin {
 						
 						sender.sendMessage(ChatColor.GREEN + "ArchonCrates Info: ");
 						sender.sendMessage(ChatColor.YELLOW + "Author: " + ChatColor.GRAY + "hammy2899");
-						sender.sendMessage(ChatColor.YELLOW + "Version: " + ChatColor.GRAY + "8.1 (Release)");
+						sender.sendMessage(ChatColor.YELLOW + "Version: " + ChatColor.GRAY + "8.2 (Release)");
 						sender.sendMessage(ChatColor.YELLOW + "Bukkit page: " + ChatColor.GRAY + "http://dev.bukkit.org/bukkit-plugins/ArchonCrates/");
 						sender.sendMessage(ChatColor.YELLOW + "Author's website: " + ChatColor.GRAY + "http://www.HamiStudios.com/");
 						sender.sendMessage(ChatColor.YELLOW + "Forums: " + ChatColor.GRAY + "http://www.hamistudios.com/forums/index.php?forums/archoncrates.13/");
@@ -605,6 +611,26 @@ public class Main extends JavaPlugin {
 					
 				}
 				
+			}
+			
+			else if(args.length == 3) {
+				
+				if(args[0].equalsIgnoreCase("giveall")) {
+					
+					if(sender.hasPermission("archoncrates.key.all") || sender.isOp() || sender instanceof ConsoleCommandSender) {
+						
+						acAPI.giveKeyAll(Integer.parseInt(args[2]), args[1]);
+						sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.GIVENALLKEY).replaceAll("<amount>", args[2]));
+						return true;
+						
+					}
+					else{
+						sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.NOPERM));
+						return true;
+					}
+					
+				}
+ 				
 			}
 			
 			else if(args.length == 4) {

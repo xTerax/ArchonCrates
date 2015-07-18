@@ -1,5 +1,6 @@
 package me.ArchonCrates.hammy2899.API;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -16,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -75,11 +77,66 @@ public class ArchonCratesAPI {
 		ArrayList<String> lore = new ArrayList<>();
 		for(String s : main.keys.getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', s));
 		keyMeta.setLore(lore);
-		key.setItemMeta(keyMeta);
 		
+		if(main.keys.getBoolean("Keys." + keyName + ".glow") == true) {
+			Glow glow = new Glow(70);
+			keyMeta.addEnchant(glow, 1, true);
+		}
+		
+        key.setItemMeta(keyMeta);
+        
 		target.getInventory().addItem(key);
 		target.updateInventory();
 		
+	}
+	
+	// Give key all method
+	@SuppressWarnings("deprecation")
+	public void giveKeyAll(int keyAmount, String keyName) {
+
+		int amount = keyAmount;
+		int keyType = main.keys.getInt("Keys." + keyName + ".itemId");
+		String keyMat = Material.getMaterial(keyType)+"";
+		ItemStack key = new ItemStack(Material.valueOf(keyMat), amount);
+		ItemMeta keyMeta = key.getItemMeta();
+		keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', main.keys.getString("Keys." + keyName + ".name")));
+		ArrayList<String> lore = new ArrayList<>();
+		for(String s : main.keys.getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', s));
+		keyMeta.setLore(lore);
+		
+		if(main.keys.getBoolean("Keys." + keyName + ".glow") == true) {
+			Glow glow = new Glow(70);
+			keyMeta.addEnchant(glow, 1, true);
+		}
+		
+        key.setItemMeta(keyMeta);
+        
+		for(Player online : Bukkit.getOnlinePlayers()) {
+			online.getInventory().addItem(key);
+			online.updateInventory();
+		}
+		
+	}
+	
+	// Register Glow Enchant
+	public void registerGlow() {
+		try {
+			Field f = Enchantment.class.getDeclaredField("acceptingNew");
+			f.setAccessible(true);
+			f.set(null, true);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			Glow glow = new Glow(70);
+			Enchantment.registerEnchantment(glow);
+		} 
+		catch (IllegalArgumentException e){
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	// Check key type
@@ -89,6 +146,7 @@ public class ArchonCratesAPI {
 		}
 		return false;
 	}
+
 	
 	// Language method
 	public String getLangMessage(LangMessages messageType) {
@@ -157,6 +215,9 @@ public class ArchonCratesAPI {
 		}
 		if(messageType.equals(LangMessages.NOKEY)) {
 			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.giveKey.No key"));
+		}
+		if(messageType.equals(LangMessages.GIVENALLKEY)) {
+			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.giveKey.given all"));
 		}
 		
 		return message;

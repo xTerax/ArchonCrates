@@ -3,6 +3,7 @@ package me.ArchonCrates.hammy2899;
 import java.util.ArrayList;
 
 import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
+import me.ArchonCrates.hammy2899.API.Glow;
 import me.ArchonCrates.hammy2899.API.LangMessages;
 
 import org.bukkit.ChatColor;
@@ -27,7 +28,6 @@ public class Events implements Listener {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		main = plugin;
 	}
-	ArchonCratesAPI acAPI = new ArchonCratesAPI(main);
 	
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
@@ -46,6 +46,7 @@ public class Events implements Listener {
 	@EventHandler
 	public void onPlayerClick(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
+		ArchonCratesAPI acAPI = new ArchonCratesAPI(main);
 		
 		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().hasItemMeta()) {
 			
@@ -96,9 +97,6 @@ public class Events implements Listener {
 								for(String s : currentCrates) {
 									if((main.crates.getDouble("Crates." + s + ".x") == x) && (main.crates.getDouble("Crates." + s + ".y") == y) && (main.crates.getDouble("Crates." + s + ".z") == z)) {
 										if(player.hasPermission("archoncrates.crate.use")) {
-
-											// Sets-up API
-											ArchonCratesAPI acAPI = new ArchonCratesAPI(main);
 											
 											event.setCancelled(true);
 											int amount = player.getItemInHand().getAmount();
@@ -111,6 +109,12 @@ public class Events implements Listener {
 												ArrayList<String> lore = new ArrayList<>();
 												for(String st : main.keys.getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', st));
 												keyMeta.setLore(lore);
+												
+												if(main.keys.getBoolean("Keys." + keyName + ".glow") == true) {
+													Glow glow = new Glow(70);
+													keyMeta.addEnchant(glow, 1, true);
+												}
+												
 												key.setItemMeta(keyMeta);
 												
 												player.getInventory().removeItem(key);
@@ -140,6 +144,7 @@ public class Events implements Listener {
 										}
 										else{
 											player.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.NOPERM));
+											event.setCancelled(true);
 										}
 									}
 								}

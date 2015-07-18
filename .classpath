@@ -5,5 +5,7 @@
 	<classpathentry kind="lib" path="G:/Bukkit Coding/Build Paths/craftbukkit-1.8.1-20141213a.jar"/>
 	<classpathentry kind="lib" path="G:/Bukkit Coding/Build Paths/spigot-1.8.1-20141213a.jar"/>
 	<classpathentry kind="lib" path="G:/Bukkit Coding/Build Paths/Vault.jar"/>
+	<classpathentry kind="lib" path="G:/Bukkit Coding/Build Paths/bukkit-1.7.10-R0.1-20140817.175650-8.jar"/>
+	<classpathentry kind="lib" path="G:/Bukkit Coding/Build Paths/spigot-1.7.10-1627.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
