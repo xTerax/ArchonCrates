@@ -248,6 +248,7 @@ public class ArchonCratesAPI {
 	public void addToBalance(Player player, double amount) {
 		eco.depositPlayer(player, amount);
 	}
+	// Take from a players balance
 	public void takeFromBalance(Player player, double amount) {
 		eco.withdrawPlayer(player, amount);
 	}
