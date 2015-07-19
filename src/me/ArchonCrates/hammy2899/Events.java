@@ -31,8 +31,9 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
-		String name = ChatColor.stripColor(main.getConfig().getString("Crate Title"));
-		if(ChatColor.stripColor(event.getInventory().getTitle()).equalsIgnoreCase(name)) {
+		String configName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("Crate Title")));
+		String inventoryName = ChatColor.stripColor(event.getInventory().getTitle());
+		if(inventoryName.equals(configName)) {
 			event.setCancelled(true);
 		}
 	}
