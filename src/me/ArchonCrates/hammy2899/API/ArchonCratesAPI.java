@@ -65,7 +65,6 @@ public class ArchonCratesAPI {
 	// Give key method
 	@SuppressWarnings("deprecation")
 	public void giveKey(String playerName, int keyAmount, String keyName) {
-
 		Player target = Bukkit.getPlayer(playerName);
 		
 		int amount = keyAmount;
@@ -87,7 +86,6 @@ public class ArchonCratesAPI {
         
 		target.getInventory().addItem(key);
 		target.updateInventory();
-		
 	}
 	
 	// Give key all method

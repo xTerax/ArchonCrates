@@ -31,15 +31,10 @@ public class Events implements Listener {
 	
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
-		
-		String name = ChatColor.stripColor(event.getInventory().getName());
-		
-		if(name.equalsIgnoreCase("Crate")) {
-			
+		String name = ChatColor.stripColor(main.getConfig().getString("Crate Title"));
+		if(ChatColor.stripColor(event.getInventory().getTitle()).equalsIgnoreCase(name)) {
 			event.setCancelled(true);
-			
 		}
-		
 	}
 	
 	@SuppressWarnings("deprecation")
