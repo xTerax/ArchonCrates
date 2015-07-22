@@ -1,16 +1,16 @@
-package me.ArchonCrates.hammy2899.Events;
+package com.HamiStudios.ArchonCrates.Events;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import me.ArchonCrates.hammy2899.DefaultFiles;
-import me.ArchonCrates.hammy2899.Main;
-import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+
+import com.HamiStudios.ArchonCrates.DefaultFiles;
+import com.HamiStudios.ArchonCrates.Main;
+import com.HamiStudios.ArchonCrates.API.ArchonCratesAPI;
 
 public class EntityDeathEvent implements Listener {
 	

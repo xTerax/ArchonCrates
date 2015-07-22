@@ -1,6 +1,6 @@
 name: ArchonCrates
-main: me.ArchonCrates.hammy2899.Main
-version: 8.1
+main: com.HamiStudios.ArchonCrates.Main
+version: 9.0
 softdepend: [Vault]
 commands:
    ArchonCrates:

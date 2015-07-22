@@ -1,12 +1,12 @@
-package me.ArchonCrates.hammy2899.ShopGUI;
+package com.HamiStudios.ArchonCrates.ShopGUI;
 
 import java.io.File;
 import java.io.IOException;
 
-import me.ArchonCrates.hammy2899.Main;
-
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import com.HamiStudios.ArchonCrates.Main;
 
 public class ShopFile {
 

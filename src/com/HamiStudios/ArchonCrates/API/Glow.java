@@ -1,4 +1,4 @@
-package me.ArchonCrates.hammy2899.API;
+package com.HamiStudios.ArchonCrates.API;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;

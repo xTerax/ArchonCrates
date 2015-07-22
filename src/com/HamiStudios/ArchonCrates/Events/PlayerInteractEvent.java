@@ -1,12 +1,6 @@
-package me.ArchonCrates.hammy2899.Events;
+package com.HamiStudios.ArchonCrates.Events;
 
 import java.util.ArrayList;
-
-import me.ArchonCrates.hammy2899.DefaultFiles;
-import me.ArchonCrates.hammy2899.Main;
-import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
-import me.ArchonCrates.hammy2899.API.Glow;
-import me.ArchonCrates.hammy2899.API.LangMessages;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,6 +13,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.HamiStudios.ArchonCrates.DefaultFiles;
+import com.HamiStudios.ArchonCrates.Main;
+import com.HamiStudios.ArchonCrates.API.ArchonCratesAPI;
+import com.HamiStudios.ArchonCrates.API.Glow;
+import com.HamiStudios.ArchonCrates.API.LangMessages;
 
 public class PlayerInteractEvent implements Listener {
 	

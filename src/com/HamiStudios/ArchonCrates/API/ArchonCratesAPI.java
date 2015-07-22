@@ -1,11 +1,9 @@
-package me.ArchonCrates.hammy2899.API;
+package com.HamiStudios.ArchonCrates.API;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 
-import me.ArchonCrates.hammy2899.DefaultFiles;
-import me.ArchonCrates.hammy2899.Main;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -28,6 +26,9 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
+
+import com.HamiStudios.ArchonCrates.DefaultFiles;
+import com.HamiStudios.ArchonCrates.Main;
 
 public class ArchonCratesAPI {
 	

@@ -1,4 +1,4 @@
-package me.ArchonCrates.hammy2899;
+package com.HamiStudios.ArchonCrates;
 
 import java.io.File;
 import java.util.ArrayList;

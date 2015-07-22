@@ -1,14 +1,7 @@
-package me.ArchonCrates.hammy2899;
+package com.HamiStudios.ArchonCrates;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
-import me.ArchonCrates.hammy2899.API.LangMessages;
-import me.ArchonCrates.hammy2899.Events.EntityDeathEvent;
-import me.ArchonCrates.hammy2899.Events.InventoryClickEvent;
-import me.ArchonCrates.hammy2899.Events.PlayerInteractEvent;
-import me.ArchonCrates.hammy2899.Events.SignEvents;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,6 +15,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.HamiStudios.ArchonCrates.API.ArchonCratesAPI;
+import com.HamiStudios.ArchonCrates.API.LangMessages;
+import com.HamiStudios.ArchonCrates.Events.EntityDeathEvent;
+import com.HamiStudios.ArchonCrates.Events.InventoryClickEvent;
+import com.HamiStudios.ArchonCrates.Events.PlayerInteractEvent;
+import com.HamiStudios.ArchonCrates.Events.SignEvents;
 
 public class Main extends JavaPlugin {
 	

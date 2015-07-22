@@ -1,10 +1,10 @@
-package me.ArchonCrates.hammy2899.Events;
-
-import me.ArchonCrates.hammy2899.Main;
+package com.HamiStudios.ArchonCrates.Events;
 
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+
+import com.HamiStudios.ArchonCrates.Main;
 
 public class InventoryClickEvent implements Listener {
 

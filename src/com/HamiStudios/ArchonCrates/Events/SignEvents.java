@@ -1,11 +1,6 @@
-package me.ArchonCrates.hammy2899.Events;
+package com.HamiStudios.ArchonCrates.Events;
 
 import java.util.ArrayList;
-
-import me.ArchonCrates.hammy2899.DefaultFiles;
-import me.ArchonCrates.hammy2899.Main;
-import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
-import me.ArchonCrates.hammy2899.API.LangMessages;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,6 +14,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import com.HamiStudios.ArchonCrates.DefaultFiles;
+import com.HamiStudios.ArchonCrates.Main;
+import com.HamiStudios.ArchonCrates.API.ArchonCratesAPI;
+import com.HamiStudios.ArchonCrates.API.LangMessages;
 
 public class SignEvents implements Listener {
 	

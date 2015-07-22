@@ -1,4 +1,4 @@
-package me.ArchonCrates.hammy2899.API;
+package com.HamiStudios.ArchonCrates.API;
 
 public enum LangMessages {
 
