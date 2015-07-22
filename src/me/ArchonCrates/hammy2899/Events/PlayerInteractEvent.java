@@ -17,21 +17,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class PlayerInteractevent implements Listener {
+public class PlayerInteractEvent implements Listener {
 	
 	Main main;
-	public PlayerInteractevent(Main plugin) {
+	public PlayerInteractEvent(Main plugin) {
 		main = plugin;
 		main.getServer().getPluginManager().registerEvents(this, main);
 	}
 
 	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void onPlayerClick(PlayerInteractEvent event) {
+	public void onPlayerClick(org.bukkit.event.player.PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ArchonCratesAPI acAPI = new ArchonCratesAPI(main);
 		DefaultFiles dFiles = new DefaultFiles(main);

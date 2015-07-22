@@ -7,7 +7,7 @@ import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
 import me.ArchonCrates.hammy2899.API.LangMessages;
 import me.ArchonCrates.hammy2899.Events.EntityDeathEvent;
 import me.ArchonCrates.hammy2899.Events.InventoryClickEvent;
-import me.ArchonCrates.hammy2899.Events.PlayerInteractevent;
+import me.ArchonCrates.hammy2899.Events.PlayerInteractEvent;
 import me.ArchonCrates.hammy2899.Events.SignEvents;
 
 import org.bukkit.Bukkit;
@@ -78,7 +78,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		
-		new PlayerInteractevent(this);
+		new PlayerInteractEvent(this);
 		new InventoryClickEvent(this);
 		new EntityDeathEvent(this);
 		new SignEvents(this);
