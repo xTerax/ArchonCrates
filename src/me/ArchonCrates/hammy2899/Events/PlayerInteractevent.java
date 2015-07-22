@@ -1,7 +1,9 @@
-package me.ArchonCrates.hammy2899;
+package me.ArchonCrates.hammy2899.Events;
 
 import java.util.ArrayList;
 
+import me.ArchonCrates.hammy2899.DefaultFiles;
+import me.ArchonCrates.hammy2899.Main;
 import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
 import me.ArchonCrates.hammy2899.API.Glow;
 import me.ArchonCrates.hammy2899.API.LangMessages;
@@ -15,55 +17,49 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class Events implements Listener {
+public class PlayerInteractevent implements Listener {
 	
 	Main main;
-	
-	public Events(Main plugin) {
-		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	public PlayerInteractevent(Main plugin) {
 		main = plugin;
+		main.getServer().getPluginManager().registerEvents(this, main);
 	}
-	
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent event) {
-		String configName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("Crate Title")));
-		String inventoryName = ChatColor.stripColor(event.getInventory().getTitle());
-		if(inventoryName.equals(configName)) {
-			event.setCancelled(true);
-		}
-	}
-	
+
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerClick(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ArchonCratesAPI acAPI = new ArchonCratesAPI(main);
+		DefaultFiles dFiles = new DefaultFiles(main);
 		
-		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().hasItemMeta()) {
+		if(player.getItemInHand() == null) {
+			return;
+		}
+		
+		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().hasItemMeta() && player.getItemInHand().getItemMeta().hasDisplayName() && player.getItemInHand().getItemMeta().hasLore()) {
 			
 			// Get keys
 			ArrayList<String> keyNames = new ArrayList<>();
-			for(String s : main.keys.getConfigurationSection("Keys").getKeys(false)) keyNames.add(s);
+			for(String s : dFiles.getKeys().getConfigurationSection("Keys").getKeys(false)) keyNames.add(s);
 			
 			String keyName = null;
 			int keyItemId = 0;
 			String keyDisplayName = null;
 			ArrayList<String> keyLore = new ArrayList<>();
 			for(String s : keyNames) {
-				if(player.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', main.keys.getString("Keys." + s + ".name")))) {
+				if(player.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', dFiles.getKeys().getString("Keys." + s + ".name")))) {
 					ArrayList<String> keyLoree = new ArrayList<>();
-					for(String st : main.keys.getStringList("Keys." + s + ".lore")) keyLoree.add(ChatColor.translateAlternateColorCodes('&', st));
+					for(String st : dFiles.getKeys().getStringList("Keys." + s + ".lore")) keyLoree.add(ChatColor.translateAlternateColorCodes('&', st));
 					if(player.getItemInHand().getItemMeta().getLore().equals(keyLoree)) {
-						if(player.getItemInHand().getTypeId() == main.keys.getInt("Keys." + s + ".itemId")) {
+						if(player.getItemInHand().getTypeId() == dFiles.getKeys().getInt("Keys." + s + ".itemId")) {
 							keyName = s;
-							keyItemId = main.keys.getInt("Keys." + keyName + ".itemId");
-							keyDisplayName = ChatColor.translateAlternateColorCodes('&', main.keys.getString("Keys." + keyName + ".name"));
-							for(String str : main.keys.getStringList("Keys." + keyName + ".lore")) keyLore.add(ChatColor.translateAlternateColorCodes('&', str));
+							keyItemId = dFiles.getKeys().getInt("Keys." + keyName + ".itemId");
+							keyDisplayName = ChatColor.translateAlternateColorCodes('&', dFiles.getKeys().getString("Keys." + keyName + ".name"));
+							for(String str : dFiles.getKeys().getStringList("Keys." + keyName + ".lore")) keyLore.add(ChatColor.translateAlternateColorCodes('&', str));
 							break;
 						}
 					}
@@ -84,14 +80,14 @@ public class Events implements Listener {
 						double y = block.getLocation().getY();
 						double z = block.getLocation().getZ();
 						
-						if(main.crates.contains("Crates")) {
+						if(main.getCrates().contains("Crates")) {
 							ArrayList<String> currentCrates = new ArrayList<String>();
-							for(String s : main.crates.getConfigurationSection("Crates").getKeys(false)) {
+							for(String s : main.getCrates().getConfigurationSection("Crates").getKeys(false)) {
 								currentCrates.add(s);
 							}
 							if(currentCrates.size() > 0) {
 								for(String s : currentCrates) {
-									if((main.crates.getDouble("Crates." + s + ".x") == x) && (main.crates.getDouble("Crates." + s + ".y") == y) && (main.crates.getDouble("Crates." + s + ".z") == z)) {
+									if((main.getCrates().getDouble("Crates." + s + ".x") == x) && (main.getCrates().getDouble("Crates." + s + ".y") == y) && (main.getCrates().getDouble("Crates." + s + ".z") == z)) {
 										if(player.hasPermission("archoncrates.crate.use")) {
 											
 											event.setCancelled(true);
@@ -101,12 +97,12 @@ public class Events implements Listener {
 												String matName2 = Material.getMaterial(keyItemId)+"";
 												ItemStack key = new ItemStack(Material.valueOf(matName2), 1);
 												ItemMeta keyMeta = key.getItemMeta();
-												keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', main.keys.getString("Keys." + keyName + ".name")));
+												keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dFiles.getKeys().getString("Keys." + keyName + ".name")));
 												ArrayList<String> lore = new ArrayList<>();
-												for(String st : main.keys.getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', st));
+												for(String st : dFiles.getKeys().getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', st));
 												keyMeta.setLore(lore);
 												
-												if(main.keys.getBoolean("Keys." + keyName + ".glow") == true) {
+												if(dFiles.getKeys().getBoolean("Keys." + keyName + ".glow") == true) {
 													Glow glow = new Glow(70);
 													keyMeta.addEnchant(glow, 1, true);
 												}

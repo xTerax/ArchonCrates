@@ -5,6 +5,10 @@ import java.util.ArrayList;
 
 import me.ArchonCrates.hammy2899.API.ArchonCratesAPI;
 import me.ArchonCrates.hammy2899.API.LangMessages;
+import me.ArchonCrates.hammy2899.Events.EntityDeathEvent;
+import me.ArchonCrates.hammy2899.Events.InventoryClickEvent;
+import me.ArchonCrates.hammy2899.Events.PlayerInteractevent;
+import me.ArchonCrates.hammy2899.Events.SignEvents;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,10 +26,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 	
 	// Crates file
-	File cratesFile;
+	public File cratesFile;
 	public FileConfiguration crates;
 	public void saveCrates() {
-		
 		try{
 			crates.save(cratesFile);
 		}
@@ -34,40 +37,22 @@ public class Main extends JavaPlugin {
 		}
 		
 	}
-	
-	// Crate loot
-	File lootFile;
-	public FileConfiguration loot;
-	public void saveCrateLoot() {
-		
-		try{
-			loot.save(lootFile);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
+	public FileConfiguration getCrates() {
+		return crates;
 	}
-	
-	// Buy sign file
-	File buySignFile;
-	public FileConfiguration buySign;
-	public void saveBuySign() {
-		
-		try{
-			buySign.save(buySignFile);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
+	public void setUpCrates() {
+		crates.set("Crate ID", 0);
+		saveCrates();
+	}
+	public void reloadCrates() {
+		cratesFile = new File(getDataFolder(), "crates.yml");
+		crates = YamlConfiguration.loadConfiguration(cratesFile);
 	}
 	
 	// Signs file
-	File signsFile;
+	public File signsFile;
 	public FileConfiguration signs;
 	public void saveSigns() {
-		
 		try{
 			signs.save(signsFile);
 		}
@@ -76,49 +61,36 @@ public class Main extends JavaPlugin {
 		}
 		
 	}
-	
-	// Keys file
-	File keysFile;
-	public FileConfiguration keys;
-	public void saveKeys() {
-		
-		try{
-			keys.save(keysFile);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
+	public FileConfiguration getSigns() {
+		return signs;
 	}
-	
-	// Lang file
-	File langFile;
-	public FileConfiguration lang;
-	public void saveLang() {
-		
-		try{
-			lang.save(langFile);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
+	public void setUpSigns() {
+		signs.set("Signs", new ArrayList<>());
+		signs.set("Signs ID", 0);
+		saveSigns();
+	}
+	public void reloadSigns() {
+		signsFile = new File(getDataFolder(), "signs.yml");
+		signs = YamlConfiguration.loadConfiguration(signsFile);
 	}
 	
 	// onEnable
 	@Override
 	public void onEnable() {
 		
-		new Events(this);
+		new PlayerInteractevent(this);
+		new InventoryClickEvent(this);
+		new EntityDeathEvent(this);
 		new SignEvents(this);
 		new ArchonCratesAPI(this);
+		
+		DefaultFiles dFiles = new DefaultFiles(this);
+//		ShopFile sFile = new ShopFile(this);
 		
 		int files = 0;
 		
 		if(!(new File(getDataFolder(), "config.yml").exists())) {
-			
 			files++;
-			
 			getConfig().set("Crate Type", 54);
 			getConfig().set("Crate Title", "&aCrate");
 			getConfig().set("Open Sound", "CHEST_OPEN");
@@ -128,193 +100,52 @@ public class Main extends JavaPlugin {
 			getConfig().set("Crate Time", 8);
 			getConfig().set("Win Message", "&3<player> has won the prize <prize> in a crate!");
 			getConfig().set("Solid Background Colour", false);
-			
 			saveConfig();
-			reloadConfig();
-			
 		}
 		
 		cratesFile = new File(getDataFolder(), "crates.yml");
 		crates = YamlConfiguration.loadConfiguration(cratesFile);
-		if(!cratesFile.exists()) {
-			
+		if(!(new File(getDataFolder(), "crates.yml").exists())) {
 			files++;
-			
-			crates.set("Crate ID", 0);
-			
-			saveCrates();
-			
+			setUpCrates();
 		}
 		
-		keysFile = new File(getDataFolder(), "keys.yml");
-		keys = YamlConfiguration.loadConfiguration(keysFile);
-		if(!keysFile.exists()) {
-			
+		if(!(new File(getDataFolder(), "keys.yml").exists())) {
 			files++;
-			
-			ArrayList<String> defaultLore = new ArrayList<>();
-			defaultLore.add("&7Right click a crate");
-			defaultLore.add("&7to use the key!");
-			
-			keys.set("Keys.default.name", "&aCrate Key");
-			keys.set("Keys.default.lore", defaultLore);
-			keys.set("Keys.default.itemId", 131);
-			keys.set("Keys.default.glow", true);
-			
-			ArrayList<String> defaultLoot = new ArrayList<>();
-			defaultLoot.add("diamonds");
-			defaultLoot.add("food");
-			defaultLoot.add("sword");
-			defaultLoot.add("gold");
-			defaultLoot.add("tools");
-			defaultLoot.add("crateKey");
-			keys.set("Keys.default.loot", defaultLoot);
-			
-			saveKeys();
-			
+			dFiles.setUpKeys();
 		}
 		
-		lootFile = new File(getDataFolder(), "crate loot.yml");
-		loot = YamlConfiguration.loadConfiguration(lootFile);
-		if(!lootFile.exists()) {
-			
+		if(!(new File(getDataFolder(), "crate loot.yml").exists())) {
 			files++;
-			
-			//Diamond loot
-			loot.set("Crate Loot.Diamonds.Item ID", 264);
-			loot.set("Crate Loot.Diamonds.Name", "&3Diamonds");
-			loot.set("Crate Loot.Diamonds.Broadcast", true);
-			loot.set("Crate Loot.Diamonds.id", "diamonds");		
-			loot.set("Crate Loot.Diamonds.Chance", 5);
-			loot.set("Crate Loot.Diamonds.Prize Name", "10 diamonds");
-			ArrayList<String> diamondCommands = new ArrayList<>();
-			diamondCommands.add("give <player> 264 10");
-			loot.set("Crate Loot.Diamonds.Command", diamondCommands);
-			
-			//Food loot
-			loot.set("Crate Loot.Food.Item ID", 364);
-			loot.set("Crate Loot.Food.Name", "&dFood");
-			loot.set("Crate Loot.Food.Broadcast", false);
-			loot.set("Crate Loot.Food.id", "food");
-			loot.set("Crate Loot.Food.Chance", 40);
-			loot.set("Crate Loot.Food.Prize Name", "food set");
-			ArrayList<String> foodCommands = new ArrayList<>();
-			foodCommands.add("give <player> 364 16");
-			foodCommands.add("give <player> 366 8");
-			foodCommands.add("give <player> 320 16");
-			loot.set("Crate Loot.Food.Command", foodCommands);
-			
-			//Sword loot
-			loot.set("Crate Loot.Sword.Item ID", 276);
-			loot.set("Crate Loot.Sword.Name", "&bSword");
-			loot.set("Crate Loot.Sword.Broadcast", true);
-			loot.set("Crate Loot.Sword.id", "sword");
-			loot.set("Crate Loot.Sword.Chance", 10);
-			loot.set("Crate Loot.Sword.Prize Name", "diamond sword");
-			ArrayList<String> swordCommands = new ArrayList<>();
-			swordCommands.add("give <player> 276 1");
-			loot.set("Crate Loot.Sword.Command", swordCommands);
-			
-			//Gold loot
-			loot.set("Crate Loot.Gold.Item ID", 266);
-			loot.set("Crate Loot.Gold.Name", "&6Gold");
-			loot.set("Crate Loot.Gold.Broadcast", true);
-			loot.set("Crate Loot.Gold.id", "gold");
-			loot.set("Crate Loot.Gold.Chance", 15);
-			loot.set("Crate Loot.Gold.Prize Name", "32 gold");
-			ArrayList<String> goldCommands = new ArrayList<>();
-			goldCommands.add("give <player> 266 32");
-			loot.set("Crate Loot.Gold.Command", goldCommands);
-			
-			//Tool loot
-			loot.set("Crate Loot.Tools.Item ID", 257);
-			loot.set("Crate Loot.Tools.Name", "&7Tools");
-			loot.set("Crate Loot.Tools.Broadcast", false);
-			loot.set("Crate Loot.Tools.id", "tools");
-			loot.set("Crate Loot.Tools.Chance", 20);
-			loot.set("Crate Loot.Tools.Prize Name", "Iron tools");
-			ArrayList<String> toolsCommands = new ArrayList<>();
-			toolsCommands.add("give <player> 257 1");
-			toolsCommands.add("give <player> 256 1");
-			toolsCommands.add("give <player> 258 1");
-			loot.set("Crate Loot.Tools.Command", toolsCommands);
-			
-			//Crate Key loot
-			loot.set("Crate Loot.CrateKey.Item ID", 131);
-			loot.set("Crate Loot.CrateKey.Name", "&aCrate Key");
-			loot.set("Crate Loot.CrateKey.Broadcast", true);
-			loot.set("Crate Loot.CrateKey.id", "crateKey");
-			loot.set("Crate Loot.CrateKey.Chance", 10);
-			loot.set("Crate Loot.CrateKey.Prize Name", "crate key");
-			ArrayList<String> keyCommands = new ArrayList<>();
-			keyCommands.add("archoncrates key <player> 1 default");
-			loot.set("Crate Loot.CrateKey.Command", keyCommands);
-			
-			saveCrateLoot();
-			
+			dFiles.setUpCrateLoot();
 		}
 		
-		buySignFile = new File(getDataFolder(), "buy sign.yml");
-		buySign = YamlConfiguration.loadConfiguration(buySignFile);
-		if(!buySignFile.exists()) {
-			
+		if(!(new File(getDataFolder(), "buy sign.yml").exists())) {
 			files++;
-			
-			buySign.set("Buy Sign.Line 1", "&7[&aBuy&7]");
-			buySign.set("Buy Sign.Line 2", "&7<amount>");
-			buySign.set("Buy Sign.Line 3", "&7<keyType> keys");
-			buySign.set("Buy Sign.Line 4", "&7Price: <price>");
-			
-			saveBuySign();
+			dFiles.setUpBuySign();
 		}
 		
 		signsFile = new File(getDataFolder(), "signs.yml");
 		signs = YamlConfiguration.loadConfiguration(signsFile);
-		if(!signsFile.exists()) {
-			
+		if(!(new File(getDataFolder(), "signs.yml").exists())) {
 			files++;
-			
-			signs.set("Signs", new ArrayList<>());
-			signs.set("Signs ID", 0);
-			
-			saveSigns();
+			setUpSigns();
 		}
 		
-		langFile = new File(getDataFolder(), "language.yml");
-		lang = YamlConfiguration.loadConfiguration(langFile);
-		if(!langFile.exists()) {
-			
+		if(!(new File(getDataFolder(), "mob drop.yml").exists())) {
 			files++;
-			
-			// Main lang
-			lang.set("Prefix", "&7[&aArchonCrates&7] ");
-			lang.set("Error Message", "&cError, try /archoncrates");
-			lang.set("No Permission", "&cYou do not have permission to do that!");
-			lang.set("Player Only Command", "&cThis command is for players only!");
-			lang.set("Crate In use", "&cThat crate is in use try again later!");
-			// Commands lang
-			lang.set("Commands.reload", "&aReload complete!");
-			lang.set("Commands.create.alreadyCrate", "&cThat is already a crate!");
-			lang.set("Commands.create.created", "&aCrate created!");
-			lang.set("Commands.create.noCrateType", "&cThat block can not be a crate! Crates must be: <crateType>!");
-			lang.set("Commands.remove.removed", "&aCrate removed!");
-			lang.set("Commands.remove.notCrate", "&cThat is not a crate!");
-			lang.set("Commands.remove.noCrates", "&cThere are no crates to remove!");
-			lang.set("Commands.remove.blockNotCrate", "&cThat block is not a crate!");
-			lang.set("Commands.giveKey.given", "&aGiven <amount> keys to <player>!");
-			lang.set("Commands.giveKey.notOnline", "&c<player> is not online! You cant give keys to offline players!");
-			lang.set("Commands.giveKey.No key", "&cThere is no key with that name!");
-			lang.set("Commands.giveKey.given all", "&aGiven <amount> keys to all players!");
-			// Signs lang
-			lang.set("Signs.No economy plugin", "&cYou can't buy keys because Vault is not installed! Contact an Administrator");
-			lang.set("Signs.buy.created", "&aBuy sign created!");
-			lang.set("Signs.buy.removed", "&cBuy sign removed!");
-			lang.set("Signs.buy.buy", "<amount> has been taken from your account.");
-			lang.set("Signs.buy.noMoney", "&cYou do not have enought money to do that!");
-			
-			
-			saveLang();
+			dFiles.setUpMobDrop();
 		}
+		
+		if(!(new File(getDataFolder(), "language.yml").exists())) {
+			files++;
+			dFiles.setUpLanguage();
+		}
+		
+//		if(!(new File(getDataFolder(), "shopGUI.yml").exists())) {
+//			files++;
+//			sFile.setUpShopFile();
+//		}
 		
 		// Sets-up API
 		ArchonCratesAPI acAPI = new ArchonCratesAPI(this);
@@ -357,6 +188,8 @@ public class Main extends JavaPlugin {
 		
 		// Sets-up API
 		ArchonCratesAPI acAPI = new ArchonCratesAPI(this);
+		// Sets up default files
+		DefaultFiles dFiles = new DefaultFiles(this);
 		
 		if(cmd.getName().equalsIgnoreCase("archoncrates") || cmd.getName().equalsIgnoreCase("ac")) {
 			
@@ -391,23 +224,17 @@ public class Main extends JavaPlugin {
 						// Reload config
 						reloadConfig();
 						//Reload crates file
-						cratesFile = new File(getDataFolder(), "crates.yml");
-						crates = YamlConfiguration.loadConfiguration(cratesFile);
+						reloadCrates();
 						// Reload loot file
-						lootFile = new File(getDataFolder(), "crate loot.yml");
-						loot = YamlConfiguration.loadConfiguration(lootFile);
+						dFiles.reloadCrateLoot();
 						// Reload buy sign file
-						buySignFile = new File(getDataFolder(), "buy sign.yml");
-						buySign = YamlConfiguration.loadConfiguration(buySignFile);
+						dFiles.reloadBuySign();
 						// Reload signs file
-						signsFile = new File(getDataFolder(), "signs.yml");
-						signs = YamlConfiguration.loadConfiguration(signsFile);
+						reloadSigns();
 						// Reload language file
-						langFile = new File(getDataFolder(), "language.yml");
-						lang = YamlConfiguration.loadConfiguration(langFile);
+						dFiles.reloadLanguage();
 						// Reload keys file
-						keysFile = new File(getDataFolder(), "keys.yml");
-						keys = YamlConfiguration.loadConfiguration(keysFile);
+						dFiles.reloadKeys();
 						
 						sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.RELOAD));
 						
@@ -434,37 +261,37 @@ public class Main extends JavaPlugin {
 								double y = block.getLocation().getY();
 								double z = block.getLocation().getZ();
 								
-								if(crates.contains("Crates")) {
+								if(getCrates().contains("Crates")) {
 									ArrayList<String> currentCrates = new ArrayList<String>();
-									for(String s : crates.getConfigurationSection("Crates").getKeys(false)) {
+									for(String s : getCrates().getConfigurationSection("Crates").getKeys(false)) {
 										currentCrates.add(s);
 									}
 									if(currentCrates.size() > 0) {
 										for(String s : currentCrates) {
-											if((crates.getDouble("Crates." + s + ".x") == x) && (crates.getDouble("Crates." + s + ".y") == y) && (crates.getDouble("Crates." + s + ".z") == z)) {
+											if((getCrates().getDouble("Crates." + s + ".x") == x) && (getCrates().getDouble("Crates." + s + ".y") == y) && (getCrates().getDouble("Crates." + s + ".z") == z)) {
 												player.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.CREATEALREADY));
 												return true;
 											}
 										}
 									}
 									
-									int crateID = crates.getInt("Crate ID");
+									int crateID = getCrates().getInt("Crate ID");
 									
-									crates.set("Crates." + crateID + ".x", x);
-									crates.set("Crates." + crateID + ".y", y);
-									crates.set("Crates." + crateID + ".z", z);
-									crates.set("Crate ID", crateID+1);
+									getCrates().set("Crate ID", crateID+1);
+									getCrates().set("Crates." + crateID + ".x", x);
+									getCrates().set("Crates." + crateID + ".y", y);
+									getCrates().set("Crates." + crateID + ".z", z);
 									saveCrates();
 									
 									player.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.CREATED));
 								}
 								else{
-									int crateID = crates.getInt("Crate ID");
+									int crateID = getCrates().getInt("Crate ID");
 									
-									crates.set("Crates." + crateID + ".x", x);
-									crates.set("Crates." + crateID + ".y", y);
-									crates.set("Crates." + crateID + ".z", z);
-									crates.set("Crate ID", crateID+1);
+									getCrates().set("Crate ID", crateID+1);
+									getCrates().set("Crates." + crateID + ".x", x);
+									getCrates().set("Crates." + crateID + ".y", y);
+									getCrates().set("Crates." + crateID + ".z", z);
 									saveCrates();
 									
 									player.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.CREATED));
@@ -506,16 +333,16 @@ public class Main extends JavaPlugin {
 
 								String crateID = "";
 								
-								if(crates.contains("Crates")) {
+								if(getCrates().contains("Crates")) {
 									ArrayList<String> currentCrates = new ArrayList<String>();
-									for(String s : crates.getConfigurationSection("Crates").getKeys(false)) {
+									for(String s : getCrates().getConfigurationSection("Crates").getKeys(false)) {
 										currentCrates.add(s);
 									}
 									if(currentCrates.size() > 0) {
 										for(String s : currentCrates) {
-											if((crates.getDouble("Crates." + s + ".x") == x) && (crates.getDouble("Crates." + s + ".y") == y) && (crates.getDouble("Crates." + s + ".z") == z)) {
+											if((getCrates().getDouble("Crates." + s + ".x") == x) && (getCrates().getDouble("Crates." + s + ".y") == y) && (getCrates().getDouble("Crates." + s + ".z") == z)) {
 												crateID = s;
-												crates.set("Crates." + crateID, null);
+												getCrates().set("Crates." + crateID, null);
 												saveCrates();
 												player.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.REMOVED));
 												return true;
@@ -571,7 +398,7 @@ public class Main extends JavaPlugin {
 						
 						StringBuilder sb = new StringBuilder();
 						ArrayList<String> keysList = new ArrayList<>();
-						for(String s : keys.getConfigurationSection("Keys").getKeys(false)) keysList.add(s);
+						for(String s : dFiles.getKeys().getConfigurationSection("Keys").getKeys(false)) keysList.add(s);
 						for(String s : keysList) sb.append(ChatColor.GRAY + s + ChatColor.GREEN + ", ");
 						
 						sender.sendMessage(ChatColor.GREEN + "Keys list: ");

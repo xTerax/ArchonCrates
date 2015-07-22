@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 
+import me.ArchonCrates.hammy2899.DefaultFiles;
 import me.ArchonCrates.hammy2899.Main;
 import net.milkbowl.vault.economy.Economy;
 
@@ -17,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -65,19 +67,22 @@ public class ArchonCratesAPI {
 	// Give key method
 	@SuppressWarnings("deprecation")
 	public void giveKey(String playerName, int keyAmount, String keyName) {
+		
+		DefaultFiles dFiles = new DefaultFiles(main);
+		
 		Player target = Bukkit.getPlayer(playerName);
 		
 		int amount = keyAmount;
-		int keyType = main.keys.getInt("Keys." + keyName + ".itemId");
+		int keyType = dFiles.getKeys().getInt("Keys." + keyName + ".itemId");
 		String keyMat = Material.getMaterial(keyType)+"";
 		ItemStack key = new ItemStack(Material.valueOf(keyMat), amount);
 		ItemMeta keyMeta = key.getItemMeta();
-		keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', main.keys.getString("Keys." + keyName + ".name")));
+		keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dFiles.getKeys().getString("Keys." + keyName + ".name")));
 		ArrayList<String> lore = new ArrayList<>();
-		for(String s : main.keys.getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', s));
+		for(String s : dFiles.getKeys().getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', s));
 		keyMeta.setLore(lore);
 		
-		if(main.keys.getBoolean("Keys." + keyName + ".glow") == true) {
+		if(dFiles.getKeys().getBoolean("Keys." + keyName + ".glow") == true) {
 			Glow glow = new Glow(70);
 			keyMeta.addEnchant(glow, 1, true);
 		}
@@ -86,23 +91,26 @@ public class ArchonCratesAPI {
         
 		target.getInventory().addItem(key);
 		target.updateInventory();
+		
 	}
 	
 	// Give key all method
 	@SuppressWarnings("deprecation")
 	public void giveKeyAll(int keyAmount, String keyName) {
 
+		DefaultFiles dFiles = new DefaultFiles(main);
+		
 		int amount = keyAmount;
-		int keyType = main.keys.getInt("Keys." + keyName + ".itemId");
+		int keyType = dFiles.getKeys().getInt("Keys." + keyName + ".itemId");
 		String keyMat = Material.getMaterial(keyType)+"";
 		ItemStack key = new ItemStack(Material.valueOf(keyMat), amount);
 		ItemMeta keyMeta = key.getItemMeta();
-		keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', main.keys.getString("Keys." + keyName + ".name")));
+		keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dFiles.getKeys().getString("Keys." + keyName + ".name")));
 		ArrayList<String> lore = new ArrayList<>();
-		for(String s : main.keys.getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', s));
+		for(String s : dFiles.getKeys().getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', s));
 		keyMeta.setLore(lore);
 		
-		if(main.keys.getBoolean("Keys." + keyName + ".glow") == true) {
+		if(dFiles.getKeys().getBoolean("Keys." + keyName + ".glow") == true) {
 			Glow glow = new Glow(70);
 			keyMeta.addEnchant(glow, 1, true);
 		}
@@ -114,6 +122,30 @@ public class ArchonCratesAPI {
 			online.updateInventory();
 		}
 		
+	}
+	
+	@SuppressWarnings("deprecation")
+	public ItemStack getKeyStack(String keyName) {
+		
+		DefaultFiles dFiles = new DefaultFiles(main);
+		
+		int keyType = dFiles.getKeys().getInt("Keys." + keyName + ".itemId");
+		String keyMat = Material.getMaterial(keyType)+"";
+		ItemStack key = new ItemStack(Material.valueOf(keyMat));
+		ItemMeta keyMeta = key.getItemMeta();
+		keyMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', dFiles.getKeys().getString("Keys." + keyName + ".name")));
+		ArrayList<String> lore = new ArrayList<>();
+		for(String s : dFiles.getKeys().getStringList("Keys." + keyName + ".lore")) lore.add(ChatColor.translateAlternateColorCodes('&', s));
+		keyMeta.setLore(lore);
+		
+		if(dFiles.getKeys().getBoolean("Keys." + keyName + ".glow") == true) {
+			Glow glow = new Glow(70);
+			keyMeta.addEnchant(glow, 1, true);
+		}
+		
+        key.setItemMeta(keyMeta);
+		
+        return key;
 	}
 	
 	// Register Glow Enchant
@@ -139,7 +171,10 @@ public class ArchonCratesAPI {
 	
 	// Check key type
 	public boolean checkKeyType(String keyName) {
-		if(main.keys.contains("Keys." + keyName)) {
+
+		DefaultFiles dFiles = new DefaultFiles(main);
+		
+		if(dFiles.getKeys().contains("Keys." + keyName)) {
 			return true;
 		}
 		return false;
@@ -148,74 +183,76 @@ public class ArchonCratesAPI {
 	
 	// Language method
 	public String getLangMessage(LangMessages messageType) {
+
+		DefaultFiles dFiles = new DefaultFiles(main);
 		
 		String message = "";
 		
 		if(messageType.equals(LangMessages.PREFIX)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Prefix"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Prefix"));
 		}
 		if(messageType.equals(LangMessages.ERROR)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Error Message"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Error Message"));
 		}
 		if(messageType.equals(LangMessages.NOPERM)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("No Permission"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("No Permission"));
 		}
 		if(messageType.equals(LangMessages.PLAYERONLYCMD)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Player Only Command"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Player Only Command"));
 		}
 		if(messageType.equals(LangMessages.RELOAD)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.reload"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.reload"));
 		}
 		if(messageType.equals(LangMessages.CREATEALREADY)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.create.alreadyCrate"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.create.alreadyCrate"));
 		}
 		if(messageType.equals(LangMessages.CREATED)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.create.created"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.create.created"));
 		}
 		if(messageType.equals(LangMessages.NOCRATETYPE)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.create.noCrateType"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.create.noCrateType"));
 		}
 		if(messageType.equals(LangMessages.REMOVED)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.remove.removed"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.remove.removed"));
 		}
 		if(messageType.equals(LangMessages.NOTCRATE)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.remove.notCrate"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.remove.notCrate"));
 		}
 		if(messageType.equals(LangMessages.NOCRATES)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.remove.noCrates"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.remove.noCrates"));
 		}
 		if(messageType.equals(LangMessages.BLOCKNOTCRATE)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.remove.blockNotCrate"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.remove.blockNotCrate"));
 		}
 		if(messageType.equals(LangMessages.GIVEN)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.giveKey.given"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.giveKey.given"));
 		}
 		if(messageType.equals(LangMessages.NOTONLINE)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.giveKey.notOnline"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.giveKey.notOnline"));
 		}
 		if(messageType.equals(LangMessages.BUYCREATED)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Signs.buy.created"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Signs.buy.created"));
 		}
 		if(messageType.equals(LangMessages.BUYREMOVED)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Signs.buy.removed"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Signs.buy.removed"));
 		}
 		if(messageType.equals(LangMessages.BUY)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Signs.buy.buy"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Signs.buy.buy"));
 		}
 		if(messageType.equals(LangMessages.NOMONEY)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Signs.buy.noMoney"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Signs.buy.noMoney"));
 		}
 		if(messageType.equals(LangMessages.CRATEINUSE)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Crate In Use"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Crate In Use"));
 		}
 		if(messageType.equals(LangMessages.NOECOPLUGIN)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Signs.No economy plugin"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Signs.No economy plugin"));
 		}
 		if(messageType.equals(LangMessages.NOKEY)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.giveKey.No key"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.giveKey.No key"));
 		}
 		if(messageType.equals(LangMessages.GIVENALLKEY)) {
-			message = ChatColor.translateAlternateColorCodes('&', main.lang.getString("Commands.giveKey.given all"));
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.giveKey.given all"));
 		}
 		
 		return message;
@@ -238,6 +275,61 @@ public class ArchonCratesAPI {
 		
 	}
 
+	@SuppressWarnings("deprecation")
+	public void createCrate(Player player) {
+		
+		Block block = player.getTargetBlock(null, 10);
+		int blockId = block.getTypeId();
+		int crateId = main.getConfig().getInt("Crate Type");
+		
+		if(blockId == crateId) {
+			
+			double x = block.getLocation().getX();
+			double y = block.getLocation().getY();
+			double z = block.getLocation().getZ();
+			
+			if(main.getCrates().contains("Crates")) {
+				ArrayList<String> currentCrates = new ArrayList<String>();
+				for(String s : main.getCrates().getConfigurationSection("Crates").getKeys(false)) {
+					currentCrates.add(s);
+				}
+				if(currentCrates.size() > 0) {
+					for(String s : currentCrates) {
+						if((main.getCrates().getDouble("Crates." + s + ".x") == x) && (main.getCrates().getDouble("Crates." + s + ".y") == y) && (main.getCrates().getDouble("Crates." + s + ".z") == z)) {
+							player.sendMessage(getLangMessage(LangMessages.PREFIX) + getLangMessage(LangMessages.CREATEALREADY));
+							return;
+						}
+					}
+				}
+				
+				int crateID = main.getCrates().getInt("Crate ID");
+				
+				main.getCrates().set("Crates." + crateID + ".x", x);
+				main.getCrates().set("Crates." + crateID + ".y", y);
+				main.getCrates().set("Crates." + crateID + ".z", z);
+				main.getCrates().set("Crate ID", crateID+1);
+				main.saveCrates();
+				
+				player.sendMessage(getLangMessage(LangMessages.PREFIX) + getLangMessage(LangMessages.CREATED));
+			}
+			else{
+				int crateID = main.getCrates().getInt("Crate ID");
+				
+				main.getCrates().set("Crates." + crateID + ".x", x);
+				main.getCrates().set("Crates." + crateID + ".y", y);
+				main.getCrates().set("Crates." + crateID + ".z", z);
+				main.getCrates().set("Crate ID", crateID+1);
+				main.saveCrates();
+				
+				player.sendMessage(getLangMessage(LangMessages.PREFIX) + getLangMessage(LangMessages.CREATED));
+			}
+			
+		}
+		else{
+			player.sendMessage(getLangMessage(LangMessages.PREFIX) + getLangMessage(LangMessages.NOCRATETYPE).replaceAll("<crateType>", Material.getMaterial(crateId).toString().toLowerCase()));
+		}
+	}
+	
 	// Get players balance
 	public double getBalance(Player player) {
 		return eco.getBalance(player);
@@ -262,11 +354,15 @@ public class ArchonCratesAPI {
 	@SuppressWarnings("deprecation")
 	public void openCrate(final Player player, String keyName) {
 		
+
+		DefaultFiles dFiles = new DefaultFiles(main);
+		
+		
 		// Get key details
 		ArrayList<String> keyLoot = new ArrayList<>();
-		for(String s : main.keys.getStringList("Keys." + keyName + ".loot")) keyLoot.add(s);
+		for(String s : dFiles.getKeys().getStringList("Keys." + keyName + ".loot")) keyLoot.add(s);
 		
-		// Main crate GUI
+		// dFiles crate GUI
 		final Inventory crateGUI = Bukkit.createInventory(player, 27, ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("Crate Title")));
 		
 		// Sets the glass colours
@@ -289,15 +385,15 @@ public class ArchonCratesAPI {
 		
 		// Gets and sets crate loot
 		final ArrayList<String> crateLoot = new ArrayList<String>();
-		for(String s : main.loot.getConfigurationSection("Crate Loot").getKeys(false)) crateLoot.add(s);
+		for(String s : dFiles.getCrateLoot().getConfigurationSection("Crate Loot").getKeys(false)) crateLoot.add(s);
 		
 		ArrayList<String> lootIds = new ArrayList<>();
-		for(String s : main.loot.getConfigurationSection("Crate Loot").getKeys(false)) lootIds.add(main.loot.getString("Crate Loot." + s + ".id"));
+		for(String s : dFiles.getCrateLoot().getConfigurationSection("Crate Loot").getKeys(false)) lootIds.add(dFiles.getCrateLoot().getString("Crate Loot." + s + ".id"));
 		
 		for(String s : lootIds) {
 			if(!keyLoot.contains(s)) {
-				for(String st : main.loot.getConfigurationSection("Crate Loot").getKeys(false)) {
-					if(main.loot.getString("Crate Loot." + st + ".id").equals(s)) {
+				for(String st : dFiles.getCrateLoot().getConfigurationSection("Crate Loot").getKeys(false)) {
+					if(dFiles.getCrateLoot().getString("Crate Loot." + st + ".id").equals(s)) {
 						crateLoot.remove(st);
 					}
 				}
@@ -309,7 +405,7 @@ public class ArchonCratesAPI {
 		player.openInventory(crateGUI);
 		
 		// Crates the item
-		int itemId = main.loot.getInt("Crate Loot." + crateLoot.get(0) + ".Item ID");
+		int itemId = dFiles.getCrateLoot().getInt("Crate Loot." + crateLoot.get(0) + ".Item ID");
 		String itemName = Material.getMaterial(itemId)+"";
 		ItemStack item = new ItemStack(Material.valueOf(itemName), 1);
 		crateGUI.setItem(13, item);
@@ -318,6 +414,8 @@ public class ArchonCratesAPI {
 		// Starts displaying all the different items
 		itemTime = 10;
 		ItemTask = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(main, new Runnable() {
+
+			DefaultFiles dFiles = new DefaultFiles(main);
 			
 			@Override
 			public void run() {
@@ -326,16 +424,42 @@ public class ArchonCratesAPI {
 				Random random = new Random();
 				int nextItem = random.nextInt(max) + 0;
 				
-				int ItemId = main.loot.getInt("Crate Loot." + crateLoot.get(nextItem) + ".Item ID");
-				String MaterialName = Material.getMaterial(ItemId)+"";
-				ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
-				String displayName = ChatColor.translateAlternateColorCodes('&', main.loot.getString("Crate Loot." + crateLoot.get(nextItem) + ".Name"));
-				ItemMeta itemMeta = item.getItemMeta();
-				itemMeta.setDisplayName(displayName);
-				item.setItemMeta(itemMeta);
+				String itemId = dFiles.getCrateLoot().getString("Crate Loot." + crateLoot.get(nextItem) + ".Item ID");
+				String id = "0";
+				String data = "0";
+				if(itemId.contains(";")) {
+					String[] itemIdANDdata = itemId.split(";");
+					id = itemIdANDdata[0];
+					data = itemIdANDdata[1];
+				}
+				if(!itemId.contains(";")) {
+					id = itemId;
+				}
 				
-				crateGUI.setItem(13, item);
-			
+				if(data.equalsIgnoreCase("0")) {
+					
+					String MaterialName = Material.getMaterial(Integer.parseInt(id))+"";
+					ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
+					String displayName = ChatColor.translateAlternateColorCodes('&', dFiles.getCrateLoot().getString("Crate Loot." + crateLoot.get(nextItem) + ".Name"));
+					ItemMeta itemMeta = item.getItemMeta();
+					itemMeta.setDisplayName(displayName);
+					item.setItemMeta(itemMeta);
+					
+					crateGUI.setItem(13, item);
+				}
+				if(!data.equalsIgnoreCase("0")) {
+					
+					String MaterialName = Material.getMaterial(Integer.parseInt(id))+"";
+					ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
+					item.setDurability((short)Integer.parseInt(data));
+					String displayName = ChatColor.translateAlternateColorCodes('&', dFiles.getCrateLoot().getString("Crate Loot." + crateLoot.get(nextItem) + ".Name"));
+					ItemMeta itemMeta = item.getItemMeta();
+					itemMeta.setDisplayName(displayName);
+					item.setItemMeta(itemMeta);
+				
+					crateGUI.setItem(13, item);					
+				}
+ 				
 				player.playSound(player.getLocation(), Sound.NOTE_BASS, 1, 1);
 				
 			}
@@ -407,6 +531,8 @@ public class ArchonCratesAPI {
 		
 		// Crate open time
 		DisplayTask = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, new Runnable() {
+
+			DefaultFiles dFiles = new DefaultFiles(main);
 			
 			@Override
 			public void run() {
@@ -424,15 +550,15 @@ public class ArchonCratesAPI {
 				int highest = 0;
 				// Sets the highest chance
 				for(String s : crateLoot) {
-					if(main.loot.getInt("Crate Loot." + s + ".Chance") > highest) {
-						highest = main.loot.getInt("Crate Loot." + s + ".Chance");
+					if(dFiles.getCrateLoot().getInt("Crate Loot." + s + ".Chance") > highest) {
+						highest = dFiles.getCrateLoot().getInt("Crate Loot." + s + ".Chance");
 					}
 				}
 				// Generates the random number
 				double randomNumber = random.nextInt(highest+1);
 				// Adds the items that it could be
 				for(String s : crateLoot) {
-					double chance = main.loot.getInt("Crate Loot." + s + ".Chance");
+					double chance = dFiles.getCrateLoot().getInt("Crate Loot." + s + ".Chance");
 					if(randomNumber <= chance) {
 						items.add(s);
 					}
@@ -442,30 +568,78 @@ public class ArchonCratesAPI {
 					int itemNum = random.nextInt(items.size());
 					String itemName = items.get(itemNum);
 					
-					int ItemId = main.loot.getInt("Crate Loot." + itemName + ".Item ID");
-					String MaterialName = Material.getMaterial(ItemId)+"";
-					ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
-					String displayName = ChatColor.translateAlternateColorCodes('&', main.loot.getString("Crate Loot." + itemName + ".Name"));
-					ItemMeta itemMeta = item.getItemMeta();
-					itemMeta.setDisplayName(displayName);
-					item.setItemMeta(itemMeta);
+					String itemId = dFiles.getCrateLoot().getString("Crate Loot." + itemName + ".Item ID");
+					String id = "0";
+					String data = "0";
+					if(itemId.contains(";")) {
+						String[] itemIdANDdata = itemId.split(";");
+						id = itemIdANDdata[0];
+						data = itemIdANDdata[1];
+					}
+					if(!itemId.contains(";")) {
+						id = itemId;
+					}
 					
-					crateGUI.setItem(13, item);
+					if(data.equalsIgnoreCase("0")) {
+						String MaterialName = Material.getMaterial(Integer.parseInt(id))+"";
+						ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
+						String displayName = ChatColor.translateAlternateColorCodes('&', dFiles.getCrateLoot().getString("Crate Loot." + itemName + ".Name"));
+						ItemMeta itemMeta = item.getItemMeta();
+						itemMeta.setDisplayName(displayName);
+						item.setItemMeta(itemMeta);
+						
+						crateGUI.setItem(13, item);
+					}
+					if(!data.equalsIgnoreCase("0")) {
+						String MaterialName = Material.getMaterial(Integer.parseInt(id))+"";
+						ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
+						item.setDurability((short)Integer.parseInt(data));
+						String displayName = ChatColor.translateAlternateColorCodes('&', dFiles.getCrateLoot().getString("Crate Loot." + itemName + ".Name"));
+						ItemMeta itemMeta = item.getItemMeta();
+						itemMeta.setDisplayName(displayName);
+						item.setItemMeta(itemMeta);
+						
+						crateGUI.setItem(13, item);
+					}
 					
 				}
 				if(items.size() == 1){
 					
 					String itemName = items.get(0);
 					
-					int ItemId = main.loot.getInt("Crate Loot." + itemName + ".Item ID");
-					String MaterialName = Material.getMaterial(ItemId)+"";
-					ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
-					String displayName = ChatColor.translateAlternateColorCodes('&', main.loot.getString("Crate Loot." + itemName + ".Name"));
-					ItemMeta itemMeta = item.getItemMeta();
-					itemMeta.setDisplayName(displayName);
-					item.setItemMeta(itemMeta);
+					String itemId = dFiles.getCrateLoot().getString("Crate Loot." + itemName + ".Item ID");
+					String id = "0";
+					String data = "0";
+					if(itemId.contains(";")) {
+						String[] itemIdANDdata = itemId.split(";");
+						id = itemIdANDdata[0];
+						data = itemIdANDdata[1];
+					}
+					if(!itemId.contains(";")) {
+						id = itemId;
+					}
 					
-					crateGUI.setItem(13, item);
+					if(data.equalsIgnoreCase("0")) {
+						String MaterialName = Material.getMaterial(Integer.parseInt(id))+"";
+						ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
+						String displayName = ChatColor.translateAlternateColorCodes('&', dFiles.getCrateLoot().getString("Crate Loot." + itemName + ".Name"));
+						ItemMeta itemMeta = item.getItemMeta();
+						itemMeta.setDisplayName(displayName);
+						item.setItemMeta(itemMeta);
+						
+						crateGUI.setItem(13, item);
+					}
+					if(!data.equalsIgnoreCase("0")) {
+						String MaterialName = Material.getMaterial(Integer.parseInt(id))+"";
+						ItemStack item = new ItemStack(Material.valueOf(MaterialName), 1);
+						item.setDurability((short)Integer.parseInt(data));
+						String displayName = ChatColor.translateAlternateColorCodes('&', dFiles.getCrateLoot().getString("Crate Loot." + itemName + ".Name"));
+						ItemMeta itemMeta = item.getItemMeta();
+						itemMeta.setDisplayName(displayName);
+						item.setItemMeta(itemMeta);
+						
+						crateGUI.setItem(13, item);
+					}
 					
 				}
 				
@@ -476,16 +650,31 @@ public class ArchonCratesAPI {
 				ItemMeta winItemMeta = winItem.getItemMeta();
 				String winItemName = ChatColor.stripColor(winItemMeta.getDisplayName());
 				int winItemId = winItem.getTypeId();
-				
-				
+				int winItemData = winItem.getDurability();
+
 				String winItemConfigName = "";
 				
 				for(String str : crateLoot) {
-					String name = ChatColor.translateAlternateColorCodes('&', main.loot.getString("Crate Loot." + str + ".Name"));
+					String name = ChatColor.translateAlternateColorCodes('&', dFiles.getCrateLoot().getString("Crate Loot." + str + ".Name"));
 					if(ChatColor.stripColor(name).equals(winItemName)) {
-						if(main.loot.getInt("Crate Loot." + str + ".Item ID") == winItemId) {
-							winItemConfigName = str; 
-							break;
+						
+						if(dFiles.getCrateLoot().getString("Crate Loot." + str + ".Item ID").contains(";")) {
+							
+							String[] itemId = dFiles.getCrateLoot().getString("Crate Loot." + str + ".Item ID").split(";");
+							int id = Integer.parseInt(itemId[0]);
+							int data = Integer.parseInt(itemId[1]);
+							
+							if((winItemId == id) && (winItemData == data)) {
+								winItemConfigName = str;
+								break;
+							}
+							continue;
+						}
+						else{
+							if(dFiles.getCrateLoot().getInt("Crate Loot." + str + ".Item ID") == winItemId) {
+								winItemConfigName = str; 
+								break;
+							}
 						}
 					}
 					
@@ -509,9 +698,7 @@ public class ArchonCratesAPI {
 				
 				// Commands
 				ArrayList<String> commandsList = new ArrayList<String>();
-				for(String s : main.loot.getStringList("Crate Loot." + winItemConfigName + ".Command")) {
-					commandsList.add(s);
-				}
+				for(String s : dFiles.getCrateLoot().getStringList("Crate Loot." + winItemConfigName + ".Command")) commandsList.add(s);
 				
 				// Win sound and firework
 				String winSound = main.getConfig().getString("Win Sound");
@@ -539,8 +726,8 @@ public class ArchonCratesAPI {
 				
 				// Broadcast
 				
-				if(main.loot.getString("Crate Loot." + winItemConfigName + ".Broadcast").equalsIgnoreCase("true")) {
-					String prizeName = main.loot.getString("Crate Loot." + winItemConfigName + ".Prize Name");
+				if(dFiles.getCrateLoot().getBoolean("Crate Loot." + winItemConfigName + ".Broadcast") == true) {
+					String prizeName = dFiles.getCrateLoot().getString("Crate Loot." + winItemConfigName + ".Prize Name");
 					String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("Win Message").replaceAll("<player>", player.getName()).replaceAll("<prize>", prizeName));
 					Bukkit.broadcastMessage(getLangMessage(LangMessages.PREFIX) + message);
 				}
