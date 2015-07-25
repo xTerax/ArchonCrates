@@ -155,7 +155,7 @@ public class SignEvents implements Listener {
 						World world = signLoc.getWorld();
 						ArrayList<String> signIds = new ArrayList<>();
 						for(String s : main.getSigns().getConfigurationSection("Signs").getKeys(false)) signIds.add(s);
-						String id = "";
+						String id = null;
 								
 						for(String s : signIds) {
 							if((main.getSigns().getInt("Signs." + s + ".location.x") == x) && 
@@ -165,6 +165,10 @@ public class SignEvents implements Listener {
 								id = s;
 								break;
 							}
+						}
+						
+						if(id == null) {
+							return;
 						}
 						
 						double price = main.getSigns().getDouble("Signs." + id + ".price");

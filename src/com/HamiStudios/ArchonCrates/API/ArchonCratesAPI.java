@@ -14,9 +14,11 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -35,6 +37,39 @@ public class ArchonCratesAPI {
 	Main main;
 	public ArchonCratesAPI(Main plugin) {
 		main = plugin;
+	}
+	
+	public ArrayList<String> playersInCrate = new ArrayList<>();
+	
+	public void addPlayerToCrate(Player player) {
+		ArrayList<String> players = new ArrayList<>();
+		if(main.getCrates().contains("Players in crates")) for(String s : main.getCrates().getStringList("Players in crates")) players.add(s);
+		players.add(player.getName());
+		main.getCrates().set("Players in crates", players);
+		main.saveCrates();
+	}
+	public void removePlayerFromCrate(Player player) {
+		ArrayList<String> players = new ArrayList<>();
+		if(main.getCrates().contains("Players in crates")) for(String s : main.getCrates().getStringList("Players in crates")) players.add(s);
+		players.remove(player.getName());
+		if(players.size() > 0) {
+			main.getCrates().set("Players in crates", players);
+			main.saveCrates();
+			return;
+		}
+		if(!(players.size() > 0)) {
+			main.getCrates().set("Players in crates", null);
+			main.saveCrates();
+			return;
+		}
+	}
+	public boolean isPlayerInCrate(Player player) {
+		ArrayList<String> players = new ArrayList<>();
+		if(main.getCrates().contains("Players in crates")) for(String s : main.getCrates().getStringList("Players in crates")) players.add(s);
+		if(players.contains(player.getName())) {
+			return true;
+		}
+		return false;
 	}
 	
 	// Vault setup
@@ -149,6 +184,44 @@ public class ArchonCratesAPI {
         return key;
 	}
 	
+	// Set ids if none
+	public void ifNoCrateLootIds() {
+		
+		DefaultFiles dFiles = new DefaultFiles(main);
+		
+		ArrayList<String> prizesWithNoId = new ArrayList<>();
+		
+		for(String s : dFiles.getCrateLoot().getConfigurationSection("Crate Loot").getKeys(false)) {
+			if(!dFiles.getCrateLoot().contains("Crate Loot." + s + ".id")) {
+				prizesWithNoId.add(s);
+			}
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		
+		if(prizesWithNoId.size() > 0) {
+			for(String s : prizesWithNoId) {
+				dFiles.getCrateLoot().set("Crate Loot." + s + ".id", s);
+				dFiles.saveCrateLoot();
+				sb.append(s + ", ");
+			}
+
+			ConsoleCommandSender console;
+			Server server = Bukkit.getServer();
+			console = server.getConsoleSender();
+
+			console.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&l+&e&l-------------------------------------------------------------&a&l+"));
+			
+			console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "] " + ChatColor.YELLOW + "Some crate loot did not have ids!");
+			console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "] " + ChatColor.YELLOW + "Ids have been set for: ");
+			console.sendMessage("               " + ChatColor.YELLOW + sb.toString().substring(0, sb.length()-2));
+		
+			console.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&l+&e&l-------------------------------------------------------------&a&l+"));
+			
+		}
+		
+	}
+	
 	// Register Glow Enchant
 	public void registerGlow() {
 		try {
@@ -255,21 +328,25 @@ public class ArchonCratesAPI {
 		if(messageType.equals(LangMessages.GIVENALLKEY)) {
 			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Commands.giveKey.given all"));
 		}
+		if(messageType.equals(LangMessages.CANTOPENWITHOUTKEY)) {
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Cant Open Without a key"));
+		}
+		if(messageType.equals(LangMessages.NOTENABLEDINWORLD)) {
+			message = ChatColor.translateAlternateColorCodes('&', dFiles.getLanguage().getString("Not enabled in world"));
+		}
 		
 		return message;
 	}
 
 	// Crate Effects
 	public int EffectTask;
-	public void crateEffect(final Location loc, final World world, final String effect) {
+	public void crateEffect(final Player player, final Location location, final double speed, final int count, final World world, final String effect) {
 		
 		EffectTask = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
 			
 			@Override
 			public void run() {
-				
-				world.playEffect(loc, Effect.valueOf(effect), 1);	
-				
+				world.playEffect(location, Effect.valueOf(main.getConfig().getString("Crate Effect")), 1);
 			}
 			
 		} , 0L, 10L);
@@ -353,8 +430,9 @@ public class ArchonCratesAPI {
 	private int WinTask;
 	private int itemTime;
 	@SuppressWarnings("deprecation")
-	public void openCrate(final Player player, String keyName) {
+	public void openCrate(final Player player, final String keyName) {
 		
+		addPlayerToCrate(player);
 
 		DefaultFiles dFiles = new DefaultFiles(main);
 		
@@ -461,7 +539,7 @@ public class ArchonCratesAPI {
 					crateGUI.setItem(13, item);					
 				}
  				
-				player.playSound(player.getLocation(), Sound.NOTE_BASS, 1, 1);
+				player.playSound(player.getLocation(), Sound.valueOf(main.getConfig().getString("Scroll Sound")), 1, 1);
 				
 			}
 		}, 0L, itemTime);
@@ -697,6 +775,8 @@ public class ArchonCratesAPI {
 					
 				}
 				
+				removePlayerFromCrate(player);
+				
 				// Commands
 				ArrayList<String> commandsList = new ArrayList<String>();
 				for(String s : dFiles.getCrateLoot().getStringList("Crate Loot." + winItemConfigName + ".Command")) commandsList.add(s);
@@ -729,7 +809,7 @@ public class ArchonCratesAPI {
 				
 				if(dFiles.getCrateLoot().getBoolean("Crate Loot." + winItemConfigName + ".Broadcast") == true) {
 					String prizeName = dFiles.getCrateLoot().getString("Crate Loot." + winItemConfigName + ".Prize Name");
-					String message = ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("Win Message").replaceAll("<player>", player.getName()).replaceAll("<prize>", prizeName));
+					String message = ChatColor.translateAlternateColorCodes('&', dFiles.getKeys().getString("Keys." + keyName + ".winMessage").replaceAll("<player>", player.getName()).replaceAll("<prize>", prizeName));
 					Bukkit.broadcastMessage(getLangMessage(LangMessages.PREFIX) + message);
 				}
 				

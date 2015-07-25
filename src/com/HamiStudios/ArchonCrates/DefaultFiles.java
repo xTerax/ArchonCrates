@@ -115,6 +115,17 @@ public class DefaultFiles {
 		keyCommands.add("archoncrates key <player> 1 default");
 		loot.set("Crate Loot.CrateKey.Command", keyCommands);
 		
+		//Developer head loot
+		loot.set("Crate Loot.DevHead.Item ID", "397;3");
+		loot.set("Crate Loot.DevHead.Name", "&cDevelopers Head");
+		loot.set("Crate Loot.DevHead.Broadcast", true);
+		loot.set("Crate Loot.DevHead.id", "devHead");
+		loot.set("Crate Loot.DevHead.Chance", 30);
+		loot.set("Crate Loot.DevHead.Prize Name", "developers head");
+		ArrayList<String> devHeadCommands = new ArrayList<>();
+		devHeadCommands.add("minecraft:give <player> skull 1 3 {SkullOwner:\"Hamiii\",Unbreakable:1}");
+		loot.set("Crate Loot.DevHead.Command", devHeadCommands);
+		
 		saveCrateLoot();
 	}
 	public void reloadCrateLoot() {
@@ -185,6 +196,7 @@ public class DefaultFiles {
 		keys.set("Keys.default.lore", defaultLore);
 		keys.set("Keys.default.itemId", 131);
 		keys.set("Keys.default.glow", true);
+		keys.set("Keys.default.winMessage", "&3<player> has won the prize <prize> in a crate!");
 		ArrayList<String> defaultLoot = new ArrayList<>();
 		defaultLoot.add("diamonds");
 		defaultLoot.add("food");
@@ -202,12 +214,14 @@ public class DefaultFiles {
 		keys.set("Keys.golden.lore", goldenLore);
 		keys.set("Keys.golden.itemId", 396);
 		keys.set("Keys.golden.glow", true);
+		keys.set("Keys.golden.winMessage", "&6<player> has won the prize <prize> in a crate!");
 		ArrayList<String> goldenLoot = new ArrayList<>();
 		goldenLoot.add("diamonds");
 		goldenLoot.add("sword");
 		goldenLoot.add("gold");
 		goldenLoot.add("godApple");
 		goldenLoot.add("crateKey");
+		goldenLoot.add("devHead");
 		keys.set("Keys.golden.loot", goldenLoot);
 		
 		saveKeys();
@@ -525,6 +539,8 @@ public class DefaultFiles {
 		lang.set("No Permission", "&cYou do not have permission to do that!");
 		lang.set("Player Only Command", "&cThis command is for players only!");
 		lang.set("Crate In use", "&cThat crate is in use try again later!");
+		lang.set("Cant Open Without a key", "&cYou cant open a crate without a key!");
+		lang.set("Not enabled in world", "&cCrates are not enabled in this world!");
 		// Commands lang
 		lang.set("Commands.reload", "&aReload complete!");
 		lang.set("Commands.create.alreadyCrate", "&cThat is already a crate!");

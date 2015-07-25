@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,9 +19,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.HamiStudios.ArchonCrates.API.ArchonCratesAPI;
 import com.HamiStudios.ArchonCrates.API.LangMessages;
+import com.HamiStudios.ArchonCrates.API.UpdateChecker;
 import com.HamiStudios.ArchonCrates.Events.EntityDeathEvent;
 import com.HamiStudios.ArchonCrates.Events.InventoryClickEvent;
+import com.HamiStudios.ArchonCrates.Events.InventoryCloseEvent;
 import com.HamiStudios.ArchonCrates.Events.PlayerInteractEvent;
+import com.HamiStudios.ArchonCrates.Events.PlayerJoinEvent;
 import com.HamiStudios.ArchonCrates.Events.SignEvents;
 
 public class Main extends JavaPlugin {
@@ -83,6 +87,8 @@ public class Main extends JavaPlugin {
 		new EntityDeathEvent(this);
 		new SignEvents(this);
 		new ArchonCratesAPI(this);
+		new InventoryCloseEvent(this);
+		new PlayerJoinEvent(this);
 		
 		DefaultFiles dFiles = new DefaultFiles(this);
 //		ShopFile sFile = new ShopFile(this);
@@ -91,15 +97,20 @@ public class Main extends JavaPlugin {
 		
 		if(!(new File(getDataFolder(), "config.yml").exists())) {
 			files++;
+			getConfig().set("Check for updates", true);
 			getConfig().set("Crate Type", 54);
 			getConfig().set("Crate Title", "&aCrate");
 			getConfig().set("Open Sound", "CHEST_OPEN");
 			getConfig().set("Win Sound", "LEVEL_UP");
 			getConfig().set("Crate Effect Enabled", true);
 			getConfig().set("Crate Effect", "MOBSPAWNER_FLAMES");
+			getConfig().set("Scroll Sound", "NOTE_BASS");
 			getConfig().set("Crate Time", 8);
-			getConfig().set("Win Message", "&3<player> has won the prize <prize> in a crate!");
 			getConfig().set("Solid Background Colour", false);
+			getConfig().set("Stop crate opening", true);
+			ArrayList<String> worlds = new ArrayList<>();
+			for(World w : Bukkit.getWorlds()) worlds.add(w.getName());
+			getConfig().set("Worlds Enabled", worlds);
 			saveConfig();
 		}
 		
@@ -163,9 +174,39 @@ public class Main extends JavaPlugin {
 		console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "]" + ChatColor.GREEN + " has been enabled!");
 		
 		if(files > 0) {
+			
+			console.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&l+&e&l-------------------------------------------------------------&a&l+"));
+			
 			console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "] " + ChatColor.YELLOW + "Some files where missing!");
 			console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "] " + ChatColor.YELLOW + "Missing files have been created!");
+		
+			console.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&l+&e&l-------------------------------------------------------------&a&l+"));
+			
 		}
+		
+		if(getConfig().getBoolean("Check for updates") == true) {
+			
+			console.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&l+&e&l-------------------------------------------------------------&a&l+"));
+			
+			console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "] " + ChatColor.YELLOW + "Checking for updates...");
+		
+			UpdateChecker updateChecker = new UpdateChecker("http://dev.bukkit.org/bukkit-plugins/archoncrates/files.rss");
+			
+			if(updateChecker.check() == true) {
+				console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "] " + ChatColor.RED + "There is a new version of ArchonCrates!");
+				console.sendMessage(ChatColor.GRAY + "               Version: " + ChatColor.AQUA + updateChecker.getLatestVersion());
+				console.sendMessage(ChatColor.GRAY + "               Link: " + ChatColor.AQUA + updateChecker.getLatestLink());
+			}
+			else{
+				console.sendMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "ArchonCrates" + ChatColor.GRAY + "] " + ChatColor.GREEN + ChatColor.GREEN + "ArchonCrates is up to date!");
+			}
+			
+			console.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&l+&e&l-------------------------------------------------------------&a&l+"));
+			
+		}
+		
+		// Checks/Sets crate loot ids if none
+		acAPI.ifNoCrateLootIds();
 		
 	}
 	
@@ -206,6 +247,7 @@ public class Main extends JavaPlugin {
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates remove" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Deletes the crate you are looking at");
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates reload" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Reloads all the config files!");
 					sender.sendMessage(ChatColor.GREEN + "/archoncrates info" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Shows info about the plugin and shows a list of useful website links");
+					sender.sendMessage(ChatColor.GREEN + "/archoncrates checkupdate" + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Checks to see if there is a new update for the plugin");
 					
 					return true;
 				}
@@ -217,7 +259,31 @@ public class Main extends JavaPlugin {
 			
 			else if(args.length == 1) {
 				
-				if(args[0].equalsIgnoreCase("reload")) {
+				if(args[0].equalsIgnoreCase("checkupdate")) {
+					
+					if(sender.hasPermission("archoncrates.checkupdate") || sender.isOp() || sender instanceof ConsoleCommandSender) {
+
+						UpdateChecker updateChecker = new UpdateChecker("http://dev.bukkit.org/bukkit-plugins/archoncrates/files.rss");
+						
+						if(updateChecker.check() == true) {
+							sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + ChatColor.RED + "There is a new version of ArchonCrates!");
+							sender.sendMessage(ChatColor.GRAY + "Version: " + ChatColor.AQUA + updateChecker.getLatestVersion());
+							sender.sendMessage(ChatColor.GRAY + "Link: " + ChatColor.AQUA + updateChecker.getLatestLink());
+							return true;
+						}
+						sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + ChatColor.GREEN + "ArchonCrates is up to date!");
+						
+						return true;
+						
+					}
+					else{
+						sender.sendMessage(acAPI.getLangMessage(LangMessages.PREFIX) + acAPI.getLangMessage(LangMessages.NOPERM));
+						return true;
+					}
+					
+				}
+				
+				else if(args[0].equalsIgnoreCase("reload")) {
 					
 					if(sender.hasPermission("archoncrates.reload") || sender.isOp() || sender instanceof ConsoleCommandSender) {
 						
@@ -378,7 +444,7 @@ public class Main extends JavaPlugin {
 						
 						sender.sendMessage(ChatColor.GREEN + "ArchonCrates Info: ");
 						sender.sendMessage(ChatColor.YELLOW + "Author: " + ChatColor.GRAY + "hammy2899");
-						sender.sendMessage(ChatColor.YELLOW + "Version: " + ChatColor.GRAY + "8.2 (Release)");
+						sender.sendMessage(ChatColor.YELLOW + "Version: " + ChatColor.GRAY + getServer().getPluginManager().getPlugin("ArchonCrates").getDescription().getVersion());
 						sender.sendMessage(ChatColor.YELLOW + "Bukkit page: " + ChatColor.GRAY + "http://dev.bukkit.org/bukkit-plugins/ArchonCrates/");
 						sender.sendMessage(ChatColor.YELLOW + "Author's website: " + ChatColor.GRAY + "http://www.HamiStudios.com/");
 						sender.sendMessage(ChatColor.YELLOW + "Forums: " + ChatColor.GRAY + "http://www.hamistudios.com/forums/index.php?forums/archoncrates.13/");
