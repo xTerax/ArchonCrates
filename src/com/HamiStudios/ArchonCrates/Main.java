@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.HamiStudios.ArchonCrates.API.ArchonCratesAPI;
 import com.HamiStudios.ArchonCrates.API.LangMessages;
 import com.HamiStudios.ArchonCrates.API.UpdateChecker;
+import com.HamiStudios.ArchonCrates.Events.BlockBreakEvent;
 import com.HamiStudios.ArchonCrates.Events.EntityDeathEvent;
 import com.HamiStudios.ArchonCrates.Events.InventoryClickEvent;
 import com.HamiStudios.ArchonCrates.Events.InventoryCloseEvent;
@@ -89,6 +90,7 @@ public class Main extends JavaPlugin {
 		new ArchonCratesAPI(this);
 		new InventoryCloseEvent(this);
 		new PlayerJoinEvent(this);
+		new BlockBreakEvent(this);
 		
 		DefaultFiles dFiles = new DefaultFiles(this);
 //		ShopFile sFile = new ShopFile(this);
@@ -207,7 +209,11 @@ public class Main extends JavaPlugin {
 		
 		// Checks/Sets crate loot ids if none
 		acAPI.ifNoCrateLootIds();
+	
 		
+		// Applys the update changes
+		ApplyUpdates.apply();
+	
 	}
 	
 	// onDisable

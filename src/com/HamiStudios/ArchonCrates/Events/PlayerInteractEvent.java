@@ -55,6 +55,10 @@ public class PlayerInteractEvent implements Listener {
 					for(String st : currentCrates) {
 						if((main.getCrates().getDouble("Crates." + st + ".x") == x) && (main.getCrates().getDouble("Crates." + st + ".y") == y) && (main.getCrates().getDouble("Crates." + st + ".z") == z)) {
 						
+							if(event.getAction() == Action.LEFT_CLICK_BLOCK) {
+								return;
+							}
+							
 							if(event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().hasItemMeta() && player.getItemInHand().getItemMeta().hasDisplayName() && player.getItemInHand().getItemMeta().hasLore()) {
 								
 								ArrayList<String> worlds = new ArrayList<>();

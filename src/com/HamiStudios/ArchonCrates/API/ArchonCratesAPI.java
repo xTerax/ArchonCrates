@@ -443,7 +443,7 @@ public class ArchonCratesAPI {
 		
 		// dFiles crate GUI
 		final Inventory crateGUI = Bukkit.createInventory(player, 27, ChatColor.translateAlternateColorCodes('&', main.getConfig().getString("Crate Title")));
-		
+	
 		// Sets the glass colours
 		Random glassColour = new Random();
 		int x = 0;
